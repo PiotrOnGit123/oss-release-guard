@@ -5,6 +5,8 @@
 - Repository: https://github.com/PiotrOnGit123/oss-release-guard
 - Existing repository was used: yes
 - Existing release: https://github.com/PiotrOnGit123/oss-release-guard/releases/tag/v0.1.0
+- Current release publication target: https://github.com/PiotrOnGit123/oss-release-guard/releases/tag/v0.2.0
+- Verified release workflow: `.github/workflows/release.yml`; issue #8 is completed only after publication succeeds.
 
 ## Existing Repository Assessment
 
@@ -35,6 +37,10 @@ The repository was expanded instead of deleted or recreated. No transfer was nee
 - #4 Prepare v0.2.0 release metadata: https://github.com/PiotrOnGit123/oss-release-guard/pull/4
 - #12 Add challenge evidence summary: https://github.com/PiotrOnGit123/oss-release-guard/pull/12
 - #13 Fix Python 3.10 quality gate compatibility: https://github.com/PiotrOnGit123/oss-release-guard/pull/13
+- #15 Harden release decisions and enforce lint, security and package gates: https://github.com/PiotrOnGit123/oss-release-guard/pull/15
+- #18 Publish verified v0.2.0 assets and complete GitHub release tracking: https://github.com/PiotrOnGit123/oss-release-guard/pull/18
+
+Real Dependabot proposals #16 (setup-python) and #17 (checkout) received maintainer reviews and are deferred to the next milestone. They are automated contributions, not independent human reviews or invented accounts.
 
 ## Issues
 
@@ -45,22 +51,29 @@ The repository was expanded instead of deleted or recreated. No transfer was nee
 - #9 Add regression tests for release readiness gate failures: https://github.com/PiotrOnGit123/oss-release-guard/issues/9
 - #10 Improve examples for release notes generator: https://github.com/PiotrOnGit123/oss-release-guard/issues/10
 - #11 Auto-classify PRs that touch GitHub templates: https://github.com/PiotrOnGit123/oss-release-guard/issues/11
+- #14 Reject malformed release gates and support GitHub API records: https://github.com/PiotrOnGit123/oss-release-guard/issues/14
+
+PR #15 closes #5, #6, #7, #9, #10, #11, and #14 with reproducible fixes/tests and maintainer triage comments. Issue #8 tracks the actual publication separately.
 
 ## Compliance Map
 
 | Challenge requirement | Repository evidence |
 | --- | --- |
-| Pull request verification | PR template, `docs/review-guidelines.md`, `review-checklist` command, PRs #1-#4, #12, and #13 with descriptions, checklists, labels, and maintainer comments. |
+| Pull request verification | PR template, review guidelines, review-checklist command, PR descriptions/checklists, self-review submissions on #15/#18, a resolved inline finding on #15, successful CI, and actual Dependabot reviews on #16/#17. |
 | Issue classification | Issue templates, `.github/labels.yml`, `.github/repository-metadata.json`, `docs/triage-process.md`, `triage-issue` command, issues #5-#11 with labels and maintainer comments. |
-| Release management | `CHANGELOG.md`, `docs/release-process.md`, `release-readiness` command, `release-notes` command, existing `v0.1.0` GitHub release, and `v0.2.0` release metadata prepared in PR #4. |
+| Release management | Changelog, release docs, readiness/notes commands, v0.1.0 release, and verified v0.2.0 publication workflow with wheel/source assets, checksums, archive reports, and live milestone synchronization. Publication completion is tracked in #8. |
 | Security | `SECURITY.md`, security-related issue template, security labels, security-focused issues #6 and #7, CI checks, and security guidance in review and triage docs. |
-| Code quality | 40 local tests, CI workflow, `scripts/check_quality.py`, `docs/quality-standards.md`, compile checks, and no runtime dependencies. |
+| Code quality | 73 tests, 92% branch-aware runtime coverage at #15, Ruff lint/format, Bandit, pip-audit, six platform/Python combinations, an 85% coverage gate, example consistency, package validation, Dependabot, and no runtime dependencies. |
 | Maintainer documentation | `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `docs/maintainer-responsibilities.md`, `docs/architecture.md`, triage/review/release/quality docs. |
 
 ## Run Instructions
 
 ```sh
-python -m pip install .
+python -m pip install -r requirements-dev.txt .
+ruff check .
+ruff format --check .
+bandit -r oss_release_guard -ll
+pip-audit -r requirements-dev.txt --strict
 python -m compileall oss_release_guard tests scripts
 python scripts/check_quality.py
 python -m unittest discover -s tests -v
@@ -76,9 +89,11 @@ Validated locally on 2026-10-08:
 
 - `python -m compileall oss_release_guard tests scripts`: passed
 - `python scripts/check_quality.py`: passed
-- `python -m unittest discover -s tests -v`: passed, 40 tests
+- `python -m unittest discover -s tests -v`: passed, 73 tests
 - CLI smoke checks for maintainer workflow examples: passed
-- Python 3.10 quality-gate fallback was simulated by forcing `tomllib = None`.
+- The Python 3.10 matrix uses the development-only `tomli` parser rather than an ad hoc TOML fallback.
+- Ruff lint/format, Bandit, pip-audit, example outputs, distribution build, strict Twine checks, and wheel/source archive audits passed.
+- PR #15 CI passed: https://github.com/PiotrOnGit123/oss-release-guard/actions/runs/37842467178
 
 ## Assumptions And Notes
 
@@ -86,5 +101,7 @@ Validated locally on 2026-10-08:
 - No additional GitHub accounts were used.
 - No fake identities, signatures, or contributors were created.
 - The authenticated tools could create files, branches, pull requests, issues, comments, labels on issues/PRs, and merges.
-- A persistent workflow that would automatically mutate labels, milestones, and releases with `GITHUB_TOKEN` was not added because that would be broader write automation than necessary without explicit approval.
-- Live GitHub milestones and a new `v0.2.0` GitHub release were therefore not force-created by automation. The existing `v0.1.0` release remains the real GitHub release, and `.github/repository-metadata.json` records the intended `v0.2.0` release and milestone metadata for explicit maintainer publication.
+- The authorized release workflow uses a temporary job token for contents/issues writes only after CI and artifact validation. No token is stored in the repository, and ordinary CI is read-only.
+- The workflow creates the actual version milestones and synchronizes canonical labels; the final publication run and issue #8 provide evidence of completion.
+- Repository description/topics administration is not exposed by the current connector. Desired topics are recorded in `.github/repository-metadata.json`, but they are not claimed to exist as live GitHub topics.
+- This is an early functional project. External adoption, independent human review, and winning the challenge have not been established.
