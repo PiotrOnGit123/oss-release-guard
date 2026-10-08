@@ -21,10 +21,16 @@
       "title": "v0.2.0",
       "description": "Maintainer workflow helpers, process documentation, and CI quality gates.",
       "state": "closed"
+    },
+    {
+      "title": "v0.3.0",
+      "description": "Review major GitHub Actions upgrades across CI and publication workflows.",
+      "state": "open"
     }
   ],
   "milestone_items": {
-    "v0.2.0": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18]
+    "v0.2.0": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18],
+    "v0.3.0": [16, 17]
   },
   "topics": ["open-source", "maintainer-tools", "release-management", "security", "quality-assurance", "python", "cli", "issue-triage"],
   "release": {
