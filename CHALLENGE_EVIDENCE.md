@@ -34,6 +34,7 @@ The repository was expanded instead of deleted or recreated. No transfer was nee
 - #3 Add CI quality gates: https://github.com/PiotrOnGit123/oss-release-guard/pull/3
 - #4 Prepare v0.2.0 release metadata: https://github.com/PiotrOnGit123/oss-release-guard/pull/4
 - #12 Add challenge evidence summary: https://github.com/PiotrOnGit123/oss-release-guard/pull/12
+- #13 Fix Python 3.10 quality gate compatibility: https://github.com/PiotrOnGit123/oss-release-guard/pull/13
 
 ## Issues
 
@@ -49,7 +50,7 @@ The repository was expanded instead of deleted or recreated. No transfer was nee
 
 | Challenge requirement | Repository evidence |
 | --- | --- |
-| Pull request verification | PR template, `docs/review-guidelines.md`, `review-checklist` command, PRs #1-#4 and #12 with descriptions, checklists, labels, and maintainer comments. |
+| Pull request verification | PR template, `docs/review-guidelines.md`, `review-checklist` command, PRs #1-#4, #12, and #13 with descriptions, checklists, labels, and maintainer comments. |
 | Issue classification | Issue templates, `.github/labels.yml`, `.github/repository-metadata.json`, `docs/triage-process.md`, `triage-issue` command, issues #5-#11 with labels and maintainer comments. |
 | Release management | `CHANGELOG.md`, `docs/release-process.md`, `release-readiness` command, `release-notes` command, existing `v0.1.0` GitHub release, and `v0.2.0` release metadata prepared in PR #4. |
 | Security | `SECURITY.md`, security-related issue template, security labels, security-focused issues #6 and #7, CI checks, and security guidance in review and triage docs. |
@@ -77,6 +78,7 @@ Validated locally on 2026-10-08:
 - `python scripts/check_quality.py`: passed
 - `python -m unittest discover -s tests -v`: passed, 40 tests
 - CLI smoke checks for maintainer workflow examples: passed
+- Python 3.10 quality-gate fallback was simulated by forcing `tomllib = None`.
 
 ## Assumptions And Notes
 
