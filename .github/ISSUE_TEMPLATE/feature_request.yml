@@ -1,0 +1,16 @@
+name: Feature request
+description: Describe a concrete open-source maintainer workflow.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Maintainer problem
+      description: Explain the workflow and why the existing checks are insufficient.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior and acceptance criteria
+    validations:
+      required: true

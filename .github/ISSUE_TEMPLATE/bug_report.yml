@@ -1,0 +1,21 @@
+name: Bug report
+description: Report an incorrect result or failure using a minimal reproducer.
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Include Python/OS versions and a synthetic archive. Do not upload secrets or unpublished releases.
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Sanitized JSON report
+      render: json

@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oss-release-guard"
+version = "0.1.0"
+description = "Offline checksum and archive policy checks for open-source release maintainers"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "PiotrOnGit123"}]
+dependencies = []
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.scripts]
+oss-release-guard = "oss_release_guard.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/PiotrOnGit123/oss-release-guard"
+Issues = "https://github.com/PiotrOnGit123/oss-release-guard/issues"
+
+[tool.setuptools.packages.find]
+include = ["oss_release_guard*"]
