@@ -69,5 +69,5 @@ jobs:
       - name: Build and validate distributions
         run: |
           python -m build
-          twine check --strict dist/*
+          twine check --strict dist/*.whl dist/*.tar.gz
           python scripts/verify_dist.py

@@ -13,7 +13,7 @@ OSS Release Guard favors predictable behavior, small changes, and no unnecessary
 - CLI smoke tests for archive audit and maintainer workflow commands
 - `coverage run -m unittest discover -s tests`, `coverage combine`, and `coverage report` (minimum 85%, including branches)
 - `python scripts/check_examples.py`
-- `python -m build`, `twine check --strict dist/*`, and `python scripts/verify_dist.py`
+- `python -m build`, `twine check --strict dist/*.whl dist/*.tar.gz`, and `python scripts/verify_dist.py`
 
 ## Code expectations
 

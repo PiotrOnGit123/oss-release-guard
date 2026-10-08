@@ -95,7 +95,7 @@ python -m unittest discover -s tests -v
 python scripts/check_examples.py
 ```
 
-Run `coverage run -m unittest discover -s tests`, then `coverage combine` and `coverage report` for the coverage gate. Use `python -m build`, `twine check --strict dist/*`, and `python scripts/verify_dist.py` to validate release artifacts. [Dependabot](.github/dependabot.yml) proposes updates to development tools and pinned GitHub Actions.
+Run `coverage run -m unittest discover -s tests`, then `coverage combine` and `coverage report` for the coverage gate. Use `python -m build`, `twine check --strict dist/*.whl dist/*.tar.gz`, and `python scripts/verify_dist.py` to validate release artifacts. [Dependabot](.github/dependabot.yml) proposes updates to development tools and pinned GitHub Actions.
 
 ## Try a local demonstration
 
