@@ -4,8 +4,8 @@ import argparse
 import gzip
 import hashlib
 import io
-from pathlib import Path
 import tarfile
+from pathlib import Path
 
 
 def main():
@@ -23,9 +23,7 @@ def main():
                 member.mode = 0o644
                 release.addfile(member, io.BytesIO(payload))
     digest = hashlib.sha256(archive.read_bytes()).hexdigest()
-    (destination / "SHA256SUMS").write_text(
-        f"{digest}  {archive.name}\n", encoding="utf-8"
-    )
+    (destination / "SHA256SUMS").write_text(f"{digest}  {archive.name}\n", encoding="utf-8")
     print(f"Artifact: {archive}")
     print(f"SHA256: {digest}")
     return 0

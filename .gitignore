@@ -7,3 +7,6 @@ dist/
 demo/
 work/
 *.log
+.coverage*
+.ruff_cache/
+htmlcov/

@@ -6,7 +6,6 @@ import hashlib
 import io
 import json
 import os
-from pathlib import Path
 import stat
 import subprocess
 import sys
@@ -15,7 +14,7 @@ import tempfile
 import unittest
 import warnings
 import zipfile
-
+from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = PROJECT_ROOT
@@ -43,7 +42,10 @@ class ArchiveFixtureTest(unittest.TestCase):
     ) -> Path:
         path = self.directory / name
         if entries is None:
-            entries = [("project/README.md", b"Release notes\n"), ("project/src/main.c", b"int main(void) { return 0; }\n")]
+            entries = [
+                ("project/README.md", b"Release notes\n"),
+                ("project/src/main.c", b"int main(void) { return 0; }\n"),
+            ]
         with tarfile.open(path, mode) as archive:
             for member_name, contents in entries:
                 info = tarfile.TarInfo(member_name)
@@ -60,7 +62,10 @@ class ArchiveFixtureTest(unittest.TestCase):
     ) -> Path:
         path = self.directory / name
         if entries is None:
-            entries = [("project/README.md", b"Release notes\n"), ("project/src/main.c", b"int main(void) { return 0; }\n")]
+            entries = [
+                ("project/README.md", b"Release notes\n"),
+                ("project/src/main.c", b"int main(void) { return 0; }\n"),
+            ]
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
@@ -194,7 +199,9 @@ class InspectReleaseTests(ArchiveFixtureTest):
         entries = [("project/a", b"abc"), ("project/b", b"defgh")]
         for artifact in (self.make_tar(entries=entries), self.make_zip(entries=entries)):
             with self.subTest(artifact=artifact.name):
-                report = inspect_release(artifact, sha256(artifact), max_members=2, max_total_size=8)
+                report = inspect_release(
+                    artifact, sha256(artifact), max_members=2, max_total_size=8
+                )
                 self.assertTrue(report["ok"])
 
     def test_inspection_does_not_extract_or_overwrite_files(self) -> None:
@@ -251,7 +258,7 @@ class InspectReleaseTests(ArchiveFixtureTest):
             local_header = archive.infolist()[0].header_offset
         raw = bytearray(artifact.read_bytes())
         # Preserve lengths and the safe central name; only the local name changes.
-        raw[local_header + 30:local_header + 38] = b"../x.txt"
+        raw[local_header + 30 : local_header + 38] = b"../x.txt"
         artifact.write_bytes(raw)
         with self.assertRaises(AuditError):
             inspect_release(artifact, sha256(artifact))
@@ -259,13 +266,15 @@ class InspectReleaseTests(ArchiveFixtureTest):
     def test_tar_corrupt_or_truncated_header_after_valid_member_is_not_eof(self) -> None:
         for malformed in ("corrupt", "truncated"):
             with self.subTest(malformed=malformed):
-                artifact = self.make_tar("release.tar", [("first.txt", b"a"), ("second.txt", b"b")], "w")
+                artifact = self.make_tar(
+                    "release.tar", [("first.txt", b"a"), ("second.txt", b"b")], "w"
+                )
                 raw = bytearray(artifact.read_bytes())
                 # One 512-byte header and one padded payload precede header two.
                 if malformed == "corrupt":
                     raw[1024:1536] = b"X" * 512
                 else:
-                    raw = raw[:1024 + 128]
+                    raw = raw[: 1024 + 128]
                 artifact.write_bytes(raw)
                 with self.assertRaises(AuditError):
                     inspect_release(artifact, sha256(artifact))
@@ -276,8 +285,8 @@ class InspectReleaseTests(ArchiveFixtureTest):
         central_header = raw.index(b"PK\x01\x02")
         # Set encryption bit zero consistently in both ZIP headers.
         for offset in (6, central_header + 8):
-            flags = int.from_bytes(raw[offset:offset + 2], "little") | 1
-            raw[offset:offset + 2] = flags.to_bytes(2, "little")
+            flags = int.from_bytes(raw[offset : offset + 2], "little") | 1
+            raw[offset : offset + 2] = flags.to_bytes(2, "little")
         artifact.write_bytes(raw)
         self.assert_unsafe(artifact)
 
@@ -294,7 +303,9 @@ class InspectReleaseTests(ArchiveFixtureTest):
 class CommandLineTests(ArchiveFixtureTest):
     def run_cli(self, *arguments: str) -> subprocess.CompletedProcess[str]:
         environment = os.environ.copy()
-        environment["PYTHONPATH"] = str(SOURCE_ROOT) + os.pathsep + environment.get("PYTHONPATH", "")
+        environment["PYTHONPATH"] = (
+            str(SOURCE_ROOT) + os.pathsep + environment.get("PYTHONPATH", "")
+        )
         return subprocess.run(
             [sys.executable, "-m", "oss_release_guard", *arguments],
             cwd=PROJECT_ROOT,
@@ -339,7 +350,9 @@ class CommandLineTests(ArchiveFixtureTest):
         artifact = self.make_tar()
         for option, value in (("--max-members", "1"), ("--max-total-size", "1")):
             with self.subTest(option=option):
-                result = self.run_cli(str(artifact), "--sha256", sha256(artifact), option, value, "--format", "json")
+                result = self.run_cli(
+                    str(artifact), "--sha256", sha256(artifact), option, value, "--format", "json"
+                )
                 self.assertEqual(result.returncode, 1, result.stderr)
                 self.assertFalse(json.loads(result.stdout)["ok"])
 

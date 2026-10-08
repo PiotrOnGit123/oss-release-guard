@@ -1,0 +1,6 @@
+include LICENSE CHANGELOG.md CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md CHALLENGE_EVIDENCE.md
+include requirements-dev.txt
+recursive-include docs *.md *.json
+recursive-include examples *.py *.json *.md
+recursive-include scripts *.py
+recursive-include .github *.yml *.md *.json

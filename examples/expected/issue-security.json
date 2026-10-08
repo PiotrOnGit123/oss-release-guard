@@ -1,0 +1,17 @@
+{
+  "kind": "issue_triage",
+  "labels": [
+    "release",
+    "security",
+    "triage"
+  ],
+  "priority": "P0",
+  "rationale": [
+    "Security-sensitive terms were detected.",
+    "Release-management language was detected."
+  ],
+  "risk": "high",
+  "routing": "security-maintainers",
+  "schema_version": 1,
+  "title": "Potential token leak in generated release report"
+}

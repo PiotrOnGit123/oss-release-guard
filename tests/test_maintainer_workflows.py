@@ -10,7 +10,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = PROJECT_ROOT
 sys.path.insert(0, str(SOURCE_ROOT))
@@ -53,7 +52,11 @@ class MaintainerWorkflowTests(unittest.TestCase):
             {
                 "title": "Add release readiness notes",
                 "body": "Updates release checklist and quality gate docs.",
-                "files": ["docs/release-process.md", ".github/pull_request_template.md", "tests/test_maintainer_workflows.py"],
+                "files": [
+                    "docs/release-process.md",
+                    ".github/pull_request_template.md",
+                    "tests/test_maintainer_workflows.py",
+                ],
             }
         )
         for label in ("documentation", "maintenance", "quality", "release", "needs-review"):
@@ -61,7 +64,13 @@ class MaintainerWorkflowTests(unittest.TestCase):
         self.assertEqual(result["risk"], "medium")
 
     def test_review_checklist_includes_security_and_quality_sections(self) -> None:
-        checklist = build_review_checklist({"title": "Security hardening", "body": "path traversal", "files": ["oss_release_guard/core.py"]})
+        checklist = build_review_checklist(
+            {
+                "title": "Security hardening",
+                "body": "path traversal",
+                "files": ["oss_release_guard/core.py"],
+            }
+        )
         self.assertIn("## Security", checklist)
         self.assertIn("## Quality", checklist)
         self.assertIn("Suggested labels:", checklist)
@@ -90,8 +99,16 @@ class MaintainerWorkflowTests(unittest.TestCase):
                 "version": "v0.2.0",
                 "date": "2026-10-08",
                 "changes": [
-                    {"type": "security", "summary": "Harden archive path policy", "reference": "#3"},
-                    {"labels": ["bug"], "summary": "Fix duplicate member reporting", "reference": "#1"},
+                    {
+                        "type": "security",
+                        "summary": "Harden archive path policy",
+                        "reference": "#3",
+                    },
+                    {
+                        "labels": ["bug"],
+                        "summary": "Fix duplicate member reporting",
+                        "reference": "#1",
+                    },
                     {"type": "docs", "summary": "Document triage rotation"},
                     {"type": "quality", "summary": "Add local quality gate"},
                 ],
@@ -105,7 +122,9 @@ class MaintainerWorkflowTests(unittest.TestCase):
 class MaintainerCliTests(unittest.TestCase):
     def run_cli(self, *arguments: str) -> subprocess.CompletedProcess[str]:
         environment = os.environ.copy()
-        environment["PYTHONPATH"] = str(SOURCE_ROOT) + os.pathsep + environment.get("PYTHONPATH", "")
+        environment["PYTHONPATH"] = (
+            str(SOURCE_ROOT) + os.pathsep + environment.get("PYTHONPATH", "")
+        )
         return subprocess.run(
             [sys.executable, "-m", "oss_release_guard", *arguments],
             cwd=PROJECT_ROOT,
@@ -125,7 +144,9 @@ class MaintainerCliTests(unittest.TestCase):
         return Path(temp.name)
 
     def test_triage_issue_cli_outputs_json(self) -> None:
-        path = self.write_json({"title": "Release blocker bug", "body": "Tests fail before publishing"})
+        path = self.write_json(
+            {"title": "Release blocker bug", "body": "Tests fail before publishing"}
+        )
         result = self.run_cli("triage-issue", str(path), "--format", "json")
         self.assertEqual(result.returncode, 0, result.stderr)
         report = json.loads(result.stdout)
@@ -139,7 +160,9 @@ class MaintainerCliTests(unittest.TestCase):
         self.assertIn("NOT READY", result.stdout)
 
     def test_release_notes_cli_outputs_markdown(self) -> None:
-        path = self.write_json({"version": "v0.2.0", "changes": [{"type": "docs", "summary": "Add review guidelines"}]})
+        path = self.write_json(
+            {"version": "v0.2.0", "changes": [{"type": "docs", "summary": "Add review guidelines"}]}
+        )
         result = self.run_cli("release-notes", str(path))
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("## Documentation", result.stdout)

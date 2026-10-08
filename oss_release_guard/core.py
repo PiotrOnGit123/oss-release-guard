@@ -50,9 +50,16 @@ def _check_name(report: dict, name: str, is_directory: bool, seen: set[str]) -> 
     if re.match(r"^[A-Za-z]:", name):
         _finding(report, "windows_drive", "Windows drive member paths are rejected.", name)
     if "\\" in name:
-        _finding(report, "backslash_path", "Backslashes are rejected for portable path safety.", name)
+        _finding(
+            report, "backslash_path", "Backslashes are rejected for portable path safety.", name
+        )
     if any(ord(char) < 32 or 127 <= ord(char) <= 159 for char in name):
-        _finding(report, "control_character", "Member names cannot contain NUL or control characters.", name)
+        _finding(
+            report,
+            "control_character",
+            "Member names cannot contain NUL or control characters.",
+            name,
+        )
 
     parts = name.replace("\\", "/").split("/")
     if ".." in parts:
@@ -65,7 +72,12 @@ def _check_name(report: dict, name: str, is_directory: bool, seen: set[str]) -> 
             _finding(report, "empty_name", "A file must have a nonempty destination path.", name)
         return
     if normalized in seen:
-        _finding(report, "duplicate_member", "Multiple members share a normalized destination path.", name)
+        _finding(
+            report,
+            "duplicate_member",
+            "Multiple members share a normalized destination path.",
+            name,
+        )
     seen.add(normalized)
 
 
@@ -76,10 +88,20 @@ def _record_size(report: dict, name: str, size: int, max_members: int, max_total
     report["total_uncompressed_bytes"] += size
     exceeded = False
     if report["member_count"] > max_members:
-        _finding(report, "max_members_exceeded", f"Archive exceeds the limit of {max_members} members.", name)
+        _finding(
+            report,
+            "max_members_exceeded",
+            f"Archive exceeds the limit of {max_members} members.",
+            name,
+        )
         exceeded = True
     if report["total_uncompressed_bytes"] > max_total_size:
-        _finding(report, "max_total_size_exceeded", f"Archive exceeds the declared-size limit of {max_total_size} bytes.", name)
+        _finding(
+            report,
+            "max_total_size_exceeded",
+            f"Archive exceeds the declared-size limit of {max_total_size} bytes.",
+            name,
+        )
         exceeded = True
     return not exceeded
 
@@ -90,12 +112,24 @@ def _inspect_tar(source: BinaryIO, report: dict, max_members: int, max_total_siz
     # policy limit. Advancing to the next header can still read compressed data.
     with tarfile.open(fileobj=source, mode="r|*", tarinfo=_StrictTarInfo) as archive:
         for member in archive:
-            within_limits = _record_size(report, member.name, member.size, max_members, max_total_size)
+            within_limits = _record_size(
+                report, member.name, member.size, max_members, max_total_size
+            )
             _check_name(report, member.name, member.isdir(), seen)
             if member.issym() or member.islnk():
-                _finding(report, "unsafe_link", "Strict policy rejects symbolic and hard links; legitimate releases may contain links.", member.name)
+                _finding(
+                    report,
+                    "unsafe_link",
+                    "Strict policy rejects symbolic and hard links; legitimate releases may contain links.",
+                    member.name,
+                )
             elif not (member.isfile() or member.isdir()):
-                _finding(report, "special_member", "Only regular files and directories are accepted; devices, FIFOs and special entries are rejected.", member.name)
+                _finding(
+                    report,
+                    "special_member",
+                    "Only regular files and directories are accepted; devices, FIFOs and special entries are rejected.",
+                    member.name,
+                )
             if not within_limits:
                 break
 
@@ -107,10 +141,17 @@ def _inspect_zip(source: BinaryIO, report: dict, max_members: int, max_total_siz
     with zipfile.ZipFile(source) as archive:
         for member in archive.infolist():
             name = member.orig_filename
-            within_limits = _record_size(report, name, member.file_size, max_members, max_total_size)
+            within_limits = _record_size(
+                report, name, member.file_size, max_members, max_total_size
+            )
             _check_name(report, name, member.is_dir(), seen)
             if member.flag_bits & 1:
-                _finding(report, "encrypted_member", "Encrypted ZIP members are unsupported by this audit.", name)
+                _finding(
+                    report,
+                    "encrypted_member",
+                    "Encrypted ZIP members are unsupported by this audit.",
+                    name,
+                )
             elif within_limits:
                 # ZipFile.open compares local and central member names and
                 # applies its supported-feature and data-range checks. Closing
@@ -119,9 +160,19 @@ def _inspect_zip(source: BinaryIO, report: dict, max_members: int, max_total_siz
                     pass
             file_type = stat.S_IFMT(member.external_attr >> 16)
             if file_type == stat.S_IFLNK:
-                _finding(report, "unsafe_link", "Strict policy rejects symbolic links; legitimate releases may contain links.", name)
+                _finding(
+                    report,
+                    "unsafe_link",
+                    "Strict policy rejects symbolic links; legitimate releases may contain links.",
+                    name,
+                )
             elif file_type not in (0, stat.S_IFREG, stat.S_IFDIR):
-                _finding(report, "special_member", "Only regular files and directories are accepted; special ZIP entries are rejected.", name)
+                _finding(
+                    report,
+                    "special_member",
+                    "Only regular files and directories are accepted; special ZIP entries are rejected.",
+                    name,
+                )
             if not within_limits:
                 break
 
@@ -140,7 +191,9 @@ def inspect_release(
     bzip2, xz) and ZIP formats are detected from their contents. Files are never
     extracted. The counts include the member that first exceeds either bound.
     """
-    if not isinstance(expected_sha256, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", expected_sha256):
+    if not isinstance(expected_sha256, str) or not re.fullmatch(
+        r"[0-9a-fA-F]{64}", expected_sha256
+    ):
         raise AuditError("Expected SHA-256 must be exactly 64 hexadecimal characters.")
     for name, value in (("max_members", max_members), ("max_total_size", max_total_size)):
         if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
@@ -167,7 +220,11 @@ def inspect_release(
                 digest.update(chunk)
             report["sha256"] = digest.hexdigest()
             if report["sha256"] != expected_sha256:
-                _finding(report, "sha256_mismatch", "Artifact SHA-256 does not match the supplied expected digest.")
+                _finding(
+                    report,
+                    "sha256_mismatch",
+                    "Artifact SHA-256 does not match the supplied expected digest.",
+                )
                 return report
             source.seek(0)
             is_zip = zipfile.is_zipfile(source)
@@ -176,7 +233,19 @@ def inspect_release(
                 _inspect_zip(source, report, max_members, max_total_size)
             else:
                 _inspect_tar(source, report, max_members, max_total_size)
-    except (OSError, EOFError, ValueError, UnicodeError, RuntimeError, NotImplementedError, tarfile.TarError, zipfile.BadZipFile, zipfile.LargeZipFile) as error:
-        raise AuditError(f"Cannot read artifact or parse a supported TAR/ZIP archive: {error}") from error
+    except (
+        OSError,
+        EOFError,
+        ValueError,
+        UnicodeError,
+        RuntimeError,
+        NotImplementedError,
+        tarfile.TarError,
+        zipfile.BadZipFile,
+        zipfile.LargeZipFile,
+    ) as error:
+        raise AuditError(
+            f"Cannot read artifact or parse a supported TAR/ZIP archive: {error}"
+        ) from error
     report["ok"] = not report["findings"]
     return report

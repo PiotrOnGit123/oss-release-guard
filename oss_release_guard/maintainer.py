@@ -8,6 +8,31 @@ from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
+MAX_JSON_BYTES = 1_048_576
+VERSION_PATTERN = re.compile(
+    r"v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?"
+)
+
+
+def _string_items(value: Any, field: str, object_key: str) -> list[str]:
+    if isinstance(value, str):
+        value = [value]
+    if not isinstance(value, list):
+        raise ValueError(f"{field} must be a string or a list of strings or GitHub objects.")
+    items = []
+    for item in value:
+        if isinstance(item, Mapping):
+            item = item.get(object_key)
+        if not isinstance(item, str):
+            raise ValueError(f"{field} entries must contain a string {object_key}.")
+        if item.strip():
+            items.append(item.strip())
+    return items
+
+
+def _files_from(record: Mapping[str, Any]) -> list[str]:
+    return _string_items(record.get("files", record.get("changed_files", [])), "files", "filename")
+
 
 def _as_text(value: Any) -> str:
     if value is None:
@@ -24,9 +49,8 @@ def _combined_text(record: Mapping[str, Any]) -> str:
         record.get("title"),
         record.get("body"),
         record.get("summary"),
-        record.get("labels"),
-        record.get("changed_files"),
-        record.get("files"),
+        sorted(_labels_from(record)),
+        _files_from(record),
     )
     return " ".join(_as_text(field) for field in fields).lower()
 
@@ -36,12 +60,7 @@ def _matches(text: str, *patterns: str) -> bool:
 
 
 def _labels_from(record: Mapping[str, Any]) -> set[str]:
-    labels = record.get("labels", [])
-    if isinstance(labels, str):
-        return {labels}
-    if isinstance(labels, Iterable):
-        return {str(label) for label in labels if str(label).strip()}
-    return set()
+    return set(_string_items(record.get("labels", []), "labels", "name"))
 
 
 def classify_issue(record: Mapping[str, Any]) -> dict[str, Any]:
@@ -50,10 +69,14 @@ def classify_issue(record: Mapping[str, Any]) -> dict[str, Any]:
     labels = _labels_from(record)
     rationale: list[str] = []
 
-    if _matches(text, r"\b(security|vulnerability|cve|secret|token|credential|path traversal|signature)\b"):
+    if _matches(
+        text, r"\b(security|vulnerability|cve|secret|token|credential|path traversal|signature)\b"
+    ):
         labels.add("security")
         rationale.append("Security-sensitive terms were detected.")
-    if _matches(text, r"\b(bug|crash|traceback|regression|broken|incorrect|mismatch|fails?|error)\b"):
+    if _matches(
+        text, r"\b(bug|crash|traceback|regression|broken|incorrect|mismatch|fails?|error)\b"
+    ):
         labels.add("bug")
         rationale.append("Failure or regression language was detected.")
     if _matches(text, r"\b(release|changelog|version|tag|milestone|publish|cut)\b"):
@@ -70,6 +93,7 @@ def classify_issue(record: Mapping[str, Any]) -> dict[str, Any]:
         rationale.append("The scope appears suitable for a first contribution.")
 
     if "security" in labels:
+        labels.discard("good first issue")
         priority = "P0" if _matches(text, r"\b(exploit|leak|credential|token|cve)\b") else "P1"
         routing = "security-maintainers"
         risk = "high"
@@ -110,10 +134,7 @@ def classify_pull_request(record: Mapping[str, Any]) -> dict[str, Any]:
     """Classify a pull-request-like record and suggest review focus areas."""
     text = _combined_text(record)
     labels = _labels_from(record)
-    files = record.get("files") or record.get("changed_files") or []
-    if isinstance(files, str):
-        files = [files]
-    files = [str(path) for path in files]
+    files = _files_from(record)
     rationale: list[str] = []
     focus: list[str] = []
 
@@ -123,7 +144,9 @@ def classify_pull_request(record: Mapping[str, Any]) -> dict[str, Any]:
     if any(path.startswith("docs/") or path.endswith(".md") for path in files):
         labels.add("documentation")
         focus.append("Documentation accuracy and links")
-    if any(path.startswith("tests/") for path in files) or _matches(text, r"\b(test|coverage|lint|quality)\b"):
+    if any(path.startswith("tests/") for path in files) or _matches(
+        text, r"\b(test|coverage|lint|quality)\b"
+    ):
         labels.add("quality")
         focus.append("Test coverage and quality gates")
     if _matches(text, r"\b(security|vulnerability|secret|token|path traversal|signature)\b"):
@@ -202,24 +225,53 @@ def assess_release_readiness(manifest: Mapping[str, Any]) -> dict[str, Any]:
     blockers = manifest.get("unresolved_blockers", [])
     if isinstance(blockers, str):
         blockers = [blockers]
-    blocker_count = len(list(blockers))
+    if not isinstance(blockers, list) or any(
+        not isinstance(item, str) or not item.strip() for item in blockers
+    ):
+        raise ValueError("unresolved_blockers must be a string or a list of nonempty strings.")
+    version = manifest.get("version", "")
+    if not isinstance(version, str):
+        raise ValueError("version must be a string.")
+    sensitive_count = _count_sensitive_keys(manifest)
     gates = [
+        (
+            "version",
+            VERSION_PATTERN.fullmatch(version) is not None,
+            "A release version such as v0.2.0 is required.",
+        ),
         ("ci", manifest.get("ci_status") == "passing", "CI status is passing."),
         ("tests", manifest.get("tests_passed") is True, "Automated tests passed."),
-        ("quality", manifest.get("quality_gate") in (True, "passing"), "Linting or repository quality gate passed."),
-        ("security", manifest.get("security_review") in (True, "complete", "completed"), "Security review is complete."),
-        ("artifacts", manifest.get("artifacts_verified") is True, "Release artifacts were verified."),
+        (
+            "quality",
+            _confirmed(manifest.get("quality_gate"), {"passing"}),
+            "Linting or repository quality gate passed.",
+        ),
+        (
+            "security",
+            _confirmed(manifest.get("security_review"), {"complete", "completed"}),
+            "Security review is complete.",
+        ),
+        (
+            "artifacts",
+            manifest.get("artifacts_verified") is True,
+            "Release artifacts were verified.",
+        ),
         ("docs", manifest.get("docs_updated") is True, "Documentation was updated."),
         ("changelog", manifest.get("changelog_updated") is True, "Changelog was updated."),
         ("notes", manifest.get("release_notes_ready") is True, "Release notes are ready."),
-        ("blockers", blocker_count == 0, "No unresolved release blockers remain."),
+        ("blockers", len(blockers) == 0, "No unresolved release blockers remain."),
+        (
+            "sensitive_fields",
+            sensitive_count == 0,
+            "The manifest must not contain secret-like field names.",
+        ),
     ]
     gate_reports = [
         {
             "name": name,
             "passed": bool(passed),
             "severity": "error" if not passed else "info",
-            "evidence": evidence,
+            "evidence": evidence if passed else f"Requirement not met: {evidence}",
         }
         for name, passed, evidence in gates
     ]
@@ -227,11 +279,33 @@ def assess_release_readiness(manifest: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "schema_version": 1,
         "kind": "release_readiness",
-        "version": _as_text(manifest.get("version")).strip(),
+        "version": version if VERSION_PATTERN.fullmatch(version) else "",
         "ready": not failed,
+        "sensitive_field_count": sensitive_count,
         "failed_gates": [gate["name"] for gate in failed],
         "gates": gate_reports,
     }
+
+
+def _confirmed(value: Any, statuses: set[str]) -> bool:
+    return value is True or (isinstance(value, str) and value in statuses)
+
+
+def _count_sensitive_keys(value: Any) -> int:
+    """Count suspect names without copying either names or values into reports."""
+    count = 0
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            normalized = re.sub(r"([a-z])([A-Z])", r"\1_\2", str(key)).lower()
+            if re.search(
+                r"(?:^|[_-])(token|password|passwd|secret|credentials?|authorization|api[_-]?key|private[_-]?key)(?:$|[_-])",
+                normalized,
+            ):
+                count += 1
+            count += _count_sensitive_keys(item)
+    elif isinstance(value, list):
+        count += sum(_count_sensitive_keys(item) for item in value)
+    return count
 
 
 def generate_release_notes(change_log: Mapping[str, Any]) -> str:
@@ -239,7 +313,10 @@ def generate_release_notes(change_log: Mapping[str, Any]) -> str:
     version = _as_text(change_log.get("version") or "Unreleased").strip()
     date = _as_text(change_log.get("date")).strip()
     changes = change_log.get("changes", [])
+    if not isinstance(changes, list):
+        raise ValueError("changes must be a list of change objects.")
     groups = {
+        "Breaking Changes": [],
         "Security": [],
         "Added": [],
         "Changed": [],
@@ -247,15 +324,17 @@ def generate_release_notes(change_log: Mapping[str, Any]) -> str:
         "Documentation": [],
         "Quality": [],
     }
-    for item in changes if isinstance(changes, list) else []:
+    for item in changes:
         if not isinstance(item, Mapping):
-            continue
+            raise ValueError("Each change must be an object.")
         text = _as_text(item.get("summary")).strip()
         if not text:
-            continue
+            raise ValueError("Each change must have a nonempty summary.")
         kind = _as_text(item.get("type")).lower()
         labels = {label.lower() for label in _labels_from(item)}
-        if "security" in labels or kind == "security":
+        if "breaking-change" in labels or kind == "breaking":
+            group = "Breaking Changes"
+        elif "security" in labels or kind == "security":
             group = "Security"
         elif "bug" in labels or kind in {"fix", "fixed", "bugfix"}:
             group = "Fixed"
@@ -287,11 +366,40 @@ def generate_release_notes(change_log: Mapping[str, Any]) -> str:
 def load_json(path: Path) -> dict[str, Any]:
     """Load a JSON object for CLI helper commands."""
     try:
-        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        with Path(path).open("rb") as source:
+            raw = source.read(MAX_JSON_BYTES + 1)
     except OSError as error:
-        raise ValueError(f"Cannot read JSON file: {error}") from error
-    except json.JSONDecodeError as error:
-        raise ValueError(f"Cannot parse JSON file: {error}") from error
+        raise ValueError("Cannot read JSON input.") from error
+    if len(raw) > MAX_JSON_BYTES:
+        raise ValueError("JSON input exceeds the 1 MiB limit.")
+    try:
+        data = json.loads(
+            raw.decode("utf-8"), object_pairs_hook=_unique_object, parse_constant=_reject_constant
+        )
+        _check_depth(data)
+    except (UnicodeError, json.JSONDecodeError, RecursionError) as error:
+        raise ValueError("Input must be a valid UTF-8 JSON object.") from error
     if not isinstance(data, dict):
         raise ValueError("JSON input must be an object.")
     return data
+
+
+def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("Duplicate JSON keys are not allowed.")
+        result[key] = value
+    return result
+
+
+def _reject_constant(value: str) -> None:
+    raise ValueError("Non-finite JSON numbers are not allowed.")
+
+
+def _check_depth(value: Any, depth: int = 0) -> None:
+    if depth > 32:
+        raise ValueError("JSON nesting exceeds the 32-level limit.")
+    items = value.values() if isinstance(value, dict) else value if isinstance(value, list) else []
+    for item in items:
+        _check_depth(item, depth + 1)
