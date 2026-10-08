@@ -1,5 +1,6 @@
 name: Bug report
 description: Report an incorrect result or failure using a minimal reproducer.
+labels: ["bug", "triage"]
 body:
   - type: textarea
     id: expected
@@ -19,3 +20,10 @@ body:
     attributes:
       label: Sanitized JSON report
       render: json
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Maintainer safety checks
+      options:
+        - label: This report does not include credentials, private source archives, or exploit payloads.
+          required: true

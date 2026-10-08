@@ -1,0 +1,25 @@
+name: Documentation task
+description: Request a README, guide, example, or process-documentation update.
+labels: ["documentation", "triage"]
+body:
+  - type: textarea
+    id: page
+    attributes:
+      label: Page or workflow
+      description: Which document, command, or maintainer workflow needs clearer guidance?
+    validations:
+      required: true
+  - type: textarea
+    id: gap
+    attributes:
+      label: Current gap
+      description: Explain what is confusing, missing, stale, or hard to verify.
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Done when
+      description: List concrete acceptance criteria for the documentation update.
+    validations:
+      required: true
