@@ -56,6 +56,7 @@ def github_request(
         with urlopen(request, timeout=30) as response:
             return json.load(response)
     except HTTPError as error:
+        error.close()
         if error.code == 404 and missing_ok:
             return None
         raise RuntimeError(f"GitHub {method} request failed with HTTP {error.code}.") from None
