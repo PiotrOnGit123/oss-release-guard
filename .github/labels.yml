@@ -1,0 +1,30 @@
+- name: bug
+  color: d73a4a
+  description: Incorrect behavior, crash, or regression.
+- name: security
+  color: b60205
+  description: Vulnerability report, hardening task, or disclosure-sensitive concern.
+- name: triage
+  color: fbca04
+  description: Needs maintainer classification before implementation.
+- name: needs-review
+  color: 5319e7
+  description: Needs maintainer review before merge.
+- name: release
+  color: 0e8a16
+  description: Blocks or supports a versioned release.
+- name: documentation
+  color: 0075ca
+  description: Docs, examples, README, or guidance work.
+- name: quality
+  color: c2e0c6
+  description: Tests, CI, linting, maintainability, or reliability work.
+- name: good first issue
+  color: 7057ff
+  description: Small, low-risk, well-scoped task.
+- name: breaking-change
+  color: d93f0b
+  description: User-visible incompatibility or contract change.
+- name: maintenance
+  color: bfdadc
+  description: Repository hygiene, automation, process, or metadata.

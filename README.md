@@ -1,8 +1,8 @@
 # OSS Release Guard
 
-A small release-archive verification tool for open-source maintainers and downstream packagers. It checks a local archive against an expected SHA-256 digest and inspects archive metadata before an artifact enters a release or packaging workflow.
+A small maintainer toolkit for open-source release work. It helps maintainers check release archive readiness, classify issues and pull requests, generate review checklists, and prepare release notes before a project ships.
 
-Version **0.1.0** is an early project. It supports TAR, TAR.GZ, TAR.BZ2, TAR.XZ, and ZIP. The audit command does not extract files or access the network. Python 3.10 or newer is required; the runtime uses the Python standard library.
+Version **0.1.0** is an early project. The archive audit supports TAR, TAR.GZ, TAR.BZ2, TAR.XZ, and ZIP. The audit command does not extract files or access the network. Python 3.10 or newer is required; the runtime uses the Python standard library.
 
 ## Get started
 
@@ -41,6 +41,36 @@ These projects illustrate relevant release practices. This repository has no aff
 
 The [validation record](docs/validation.md) includes a successful check of the official PostgreSQL 18.0 artifact and a saved JSON report.
 
+## Maintainer workflow helpers
+
+The same CLI also supports maintainer operations around issues, pull requests, and releases:
+
+```sh
+oss-release-guard triage-issue examples/issue-security.json --format json
+oss-release-guard review-checklist examples/pr-review.json
+oss-release-guard release-readiness examples/release-manifest.json
+oss-release-guard release-notes examples/release-changes.json
+```
+
+These commands are deterministic helpers, not bots. A maintainer still makes the final call, but the output gives a consistent starting point for labels, review focus, release gates, and release notes.
+
+| Workflow | Command | Output |
+| --- | --- | --- |
+| Issue triage | `triage-issue` | Suggested labels, priority, risk, routing, and rationale. |
+| Pull request review | `review-checklist` | Markdown checklist plus suggested PR labels in JSON mode. |
+| Release management | `release-readiness` | Required gate report with a failing exit code when not ready. |
+| Release notes | `release-notes` | Grouped Markdown notes from structured change data. |
+
+## Quality gates
+
+CI runs the test suite on Linux and Windows, compiles Python sources, executes a repository quality gate, and exercises the maintainer workflow commands. The quality gate checks required maintenance documents, text hygiene, dependency policy, and the security policy:
+
+```sh
+python -m compileall oss_release_guard tests scripts
+python scripts/check_quality.py
+python -m unittest discover -s tests -v
+```
+
 ## Try a local demonstration
 
 ```sh
@@ -61,4 +91,4 @@ This synthetic example demonstrates the command; the digest generated alongside 
 python -m unittest discover -s tests -v
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), the [maintainer workflow](docs/maintainer-workflow.md), and the [impact evidence record](docs/impact.md). The project is MIT-licensed. Adoption, ecosystem impact, and eligibility for any maintainer program have not been established.
+See [CONTRIBUTING.md](CONTRIBUTING.md), [triage process](docs/triage-process.md), [review guidelines](docs/review-guidelines.md), [release process](docs/release-process.md), [quality standards](docs/quality-standards.md), [maintainer responsibilities](docs/maintainer-responsibilities.md), and [architecture](docs/architecture.md). The project is MIT-licensed. Adoption, ecosystem impact, and eligibility for any maintainer program have not been established.

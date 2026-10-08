@@ -1,0 +1,30 @@
+name: Security-related report
+description: Public placeholder for security concerns that need maintainer handling.
+labels: ["security", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include exploit archives, credentials, private source releases, or sensitive reproduction details in a public issue. If details are sensitive, request a private maintainer channel.
+  - type: dropdown
+    id: disclosure
+    attributes:
+      label: Disclosure sensitivity
+      options:
+        - Private details required
+        - Public hardening task
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: High-level summary
+      description: Describe the class of risk without publishing sensitive details.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Potential impact
+      description: Explain affected versions, workflows, or release artifacts if safe to share.
