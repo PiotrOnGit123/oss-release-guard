@@ -20,13 +20,18 @@
     {
       "title": "v0.2.0",
       "description": "Maintainer workflow helpers, process documentation, and CI quality gates.",
-      "state": "open"
+      "state": "closed"
     }
   ],
+  "milestone_items": {
+    "v0.2.0": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+  },
+  "topics": ["open-source", "maintainer-tools", "release-management", "security", "quality-assurance", "python", "cli", "issue-triage"],
   "release": {
     "tag_name": "v0.2.0",
     "name": "v0.2.0 - Maintainer workflow release",
     "prerelease": true,
-    "body": "Maintainer workflow release for OSS Release Guard.\n\nHighlights:\n- Issue triage classifier for `bug`, `security`, `triage`, `release`, `documentation`, `quality`, and `good first issue` workflows.\n- Pull request review checklist generator with risk and reviewer-focus output.\n- Release readiness gates and release notes generation from structured JSON.\n- CI quality gates covering source compilation, repository policy checks, tests, installed CLI behavior, and maintainer workflow smoke tests.\n- Expanded README, CONTRIBUTING, SECURITY, CHANGELOG, code of conduct, issue templates, PR template, and maintainer process docs.\n\nValidation:\n- Local compile check passed.\n- Local repository quality gate passed.\n- Local unittest discovery passed: 40 tests.\n\nSecurity and quality:\n- No runtime dependencies were added.\n- Vulnerability handling is documented in SECURITY.md.\n- Release artifacts should still be verified with independently trusted digests and signatures where available."
+    "notes_file": "docs/releases/v0.2.0.md",
+    "tracking_issue": 8
   }
 }
