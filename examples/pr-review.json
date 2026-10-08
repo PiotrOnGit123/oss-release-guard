@@ -1,0 +1,10 @@
+{
+  "title": "Add release readiness checks",
+  "body": "Adds a release gate report, updates docs, and touches tests.",
+  "files": [
+    "oss_release_guard/maintainer.py",
+    "tests/test_maintainer_workflows.py",
+    "docs/release-process.md",
+    ".github/pull_request_template.md"
+  ]
+}

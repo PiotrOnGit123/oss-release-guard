@@ -1,0 +1,21 @@
+{
+  "version": "v0.2.0",
+  "date": "2026-10-08",
+  "changes": [
+    {
+      "type": "security",
+      "summary": "Add security-aware issue triage for release maintenance workflows",
+      "reference": "#3"
+    },
+    {
+      "type": "quality",
+      "summary": "Add local quality gate covering documentation, text hygiene, and dependency policy",
+      "reference": "#5"
+    },
+    {
+      "type": "docs",
+      "summary": "Document triage, review, release, quality, and maintainer responsibilities",
+      "reference": "#2"
+    }
+  ]
+}

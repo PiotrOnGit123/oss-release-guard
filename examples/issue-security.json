@@ -1,0 +1,5 @@
+{
+  "title": "Potential token leak in generated release report",
+  "body": "A downstream packager noticed that release readiness output can include credential-like environment variable names. Please triage as a security hardening task before the next release.",
+  "labels": ["triage"]
+}
