@@ -26,6 +26,7 @@ REQUIRED_FILES = [
     ".github/ISSUE_TEMPLATE/feature_request.yml",
     ".github/ISSUE_TEMPLATE/documentation_task.yml",
     ".github/ISSUE_TEMPLATE/security_related.yml",
+    ".github/repository-metadata.json",
 ]
 
 

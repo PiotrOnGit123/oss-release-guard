@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 - 2026-10-08
 
 - Added maintainer workflow helpers for issue triage, pull request review checklists, release readiness gates, and release notes generation.
 - Added example JSON inputs for security triage, review checklist generation, release readiness, and release notes.

@@ -1,6 +1,6 @@
 """Offline release checks and maintainer workflow helpers."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from .core import AuditError, inspect_release
 from .maintainer import (
