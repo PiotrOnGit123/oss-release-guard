@@ -1,0 +1,8 @@
+ruff==0.16.10
+bandit==1.9.4
+coverage==7.16.2
+build==1.6.1
+twine==7.0.0
+pip-audit==2.10.1
+tomli==2.5.0; python_version < "3.11"
+setuptools==84.0.0

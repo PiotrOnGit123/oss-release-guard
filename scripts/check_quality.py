@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Any
 
 try:
     import tomllib
-except ModuleNotFoundError:  # pragma: no cover - exercised by Python 3.10 CI.
-    tomllib = None  # type: ignore[assignment]
+except ModuleNotFoundError:  # Python 3.10 uses the development-only parser.
+    import tomli as tomllib
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,7 +35,16 @@ REQUIRED_FILES = [
 
 
 def iter_text_files() -> list[Path]:
-    ignored = {".git", ".mypy_cache", ".pytest_cache", "__pycache__", "build", "dist"}
+    ignored = {
+        ".git",
+        ".mypy_cache",
+        ".pytest_cache",
+        ".ruff_cache",
+        ".venv",
+        "__pycache__",
+        "build",
+        "dist",
+    }
     files: list[Path] = []
     for path in ROOT.rglob("*"):
         if any(part in ignored for part in path.parts):
@@ -69,40 +77,7 @@ def check_text_hygiene(errors: list[str]) -> None:
 
 def load_project_metadata() -> dict[str, Any]:
     pyproject_text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    if tomllib is not None:
-        return tomllib.loads(pyproject_text).get("project", {})
-
-    in_project = False
-    dependencies: list[str] = []
-    collecting_dependencies = False
-    for raw_line in pyproject_text.splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#"):
-            continue
-        if line.startswith("[") and line.endswith("]"):
-            in_project = line == "[project]"
-            collecting_dependencies = False
-            continue
-        if not in_project:
-            continue
-        if line.startswith("dependencies"):
-            _, _, value = line.partition("=")
-            value = value.strip()
-            if value == "[]":
-                dependencies = []
-                collecting_dependencies = False
-            elif value.startswith("[") and value.endswith("]"):
-                dependencies = [item for item in value.strip("[]").split(",") if item.strip()]
-                collecting_dependencies = False
-            elif value.startswith("["):
-                collecting_dependencies = True
-            continue
-        if collecting_dependencies:
-            if line.startswith("]"):
-                collecting_dependencies = False
-            else:
-                dependencies.append(line.rstrip(","))
-    return {"dependencies": dependencies}
+    return tomllib.loads(pyproject_text).get("project", {})
 
 
 def check_dependency_policy(errors: list[str]) -> None:
@@ -125,7 +100,9 @@ def main() -> int:
         for error in errors:
             print(f"- {error}")
         return 1
-    print("Quality gate passed: docs, text hygiene, dependency policy, and security policy are in place.")
+    print(
+        "Quality gate passed: docs, text hygiene, dependency policy, and security policy are in place."
+    )
     return 0
 
 

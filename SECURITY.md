@@ -8,6 +8,8 @@ Maintainers treat vulnerability handling as release-critical work. A confirmed v
 
 If GitHub offers **Report a vulnerability** under this repository's Security tab, use that private advisory channel. Availability depends on repository settings. If it is unavailable, open an issue requesting a private reporting channel without publishing exploit details, sensitive archives, or confidential information.
 
+A safe public placeholder is: "I have a potentially sensitive report affecting the current release. Please provide a private reporting channel." Wait for a confirmed private destination before sending a reproduction. If no private channel is available, retain the details locally; a public issue is not a substitute for private disclosure. The [security-related issue form](.github/ISSUE_TEMPLATE/security_related.yml) is only for placeholders and non-sensitive hardening tasks.
+
 Include the affected version, a minimal reproduction, expected policy behavior, and potential impact when a private channel is available.
 
 Do not publish exploit archives, private source releases, credentials, tokens, or personal data in a public issue or pull request. If a public placeholder is needed, describe the class of risk and ask maintainers to open a private channel.
@@ -21,6 +23,10 @@ Do not publish exploit archives, private source releases, credentials, tokens, o
 5. Publish release notes once the fix is available, omitting sensitive exploit details when appropriate.
 
 ## Trust boundaries
+
+Maintainer JSON inputs are limited to 1 MiB and 32 nesting levels. Invalid UTF-8, duplicate object keys, and non-finite numbers are rejected. The release gate counts secret-like field names, including nested names, and blocks the release without echoing those names or values. This is a conservative field-name rule, not a complete secret scanner: values under unrelated names can still contain sensitive information. Sanitize inputs before committing or sharing them. Readiness results reflect caller declarations rather than independently verified live CI state.
+
+CI runs Bandit on the runtime Python package and audits pinned development dependencies with pip-audit. Passing those checks does not establish the absence of vulnerabilities.
 
 The audit reads local files and parses archive metadata. It does not extract members or fetch an expected digest. Obtain the digest independently through a trusted release process. The parser and Python runtime remain part of the attack surface.
 

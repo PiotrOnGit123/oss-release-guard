@@ -5,17 +5,27 @@
     {
       "type": "security",
       "summary": "Add security-aware issue triage for release maintenance workflows",
-      "reference": "#3"
+      "reference": "#1"
     },
     {
       "type": "quality",
       "summary": "Add local quality gate covering documentation, text hygiene, and dependency policy",
-      "reference": "#5"
+      "reference": "#3"
     },
     {
       "type": "docs",
       "summary": "Document triage, review, release, quality, and maintainer responsibilities",
       "reference": "#2"
+    },
+    {
+      "type": "fix",
+      "summary": "Use a compatible TOML parser for the Python 3.10 quality gate",
+      "reference": "#13"
+    },
+    {
+      "type": "breaking",
+      "summary": "Reject malformed, duplicate-key and oversized maintainer JSON inputs; release readiness now requires a version and blocks secret-like fields",
+      "reference": "#14"
     }
   ]
 }

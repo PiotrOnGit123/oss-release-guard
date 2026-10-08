@@ -1,5 +1,8 @@
 # OSS Release Guard
 
+[![Tests](https://github.com/PiotrOnGit123/oss-release-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/PiotrOnGit123/oss-release-guard/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/PiotrOnGit123/oss-release-guard?include_prereleases)](https://github.com/PiotrOnGit123/oss-release-guard/releases)
+
 A small maintainer toolkit for open-source release work. It helps maintainers check release archive readiness, classify issues and pull requests, generate review checklists, and prepare release notes before a project ships.
 
 Version **0.2.0** is an early project. The archive audit supports TAR, TAR.GZ, TAR.BZ2, TAR.XZ, and ZIP. The audit command does not extract files or access the network. Python 3.10 or newer is required; the runtime uses the Python standard library.
@@ -54,6 +57,21 @@ oss-release-guard release-notes examples/release-changes.json
 
 These commands are deterministic helpers, not bots. A maintainer still makes the final call, but the output gives a consistent starting point for labels, review focus, release gates, and release notes.
 
+They accept simple JSON records and GitHub API label (`{"name": "security"}`) and changed-file (`{"filename": "SECURITY.md"}`) objects. The readiness manifest records maintainer declarations; it does not query live CI or authenticate the evidence supplied by a caller. Missing or invalid versions, failed gates, unresolved blockers, and secret-like fields prevent a ready result. Invalid input exits `2`; a valid but blocked release exits `1`.
+
+Example triage result:
+
+```json
+{
+  "labels": ["release", "security", "triage"],
+  "priority": "P0",
+  "risk": "high",
+  "routing": "security-maintainers"
+}
+```
+
+Full reproducible outputs are in [examples/expected](examples/expected). Release notes separate security, fixes, documentation, quality, and breaking changes. Input validation changes are described in [CHANGELOG.md](CHANGELOG.md).
+
 | Workflow | Command | Output |
 | --- | --- | --- |
 | Issue triage | `triage-issue` | Suggested labels, priority, risk, routing, and rationale. |
@@ -63,13 +81,21 @@ These commands are deterministic helpers, not bots. A maintainer still makes the
 
 ## Quality gates
 
-CI runs the test suite on Linux and Windows, compiles Python sources, executes a repository quality gate, and exercises the maintainer workflow commands. The quality gate checks required maintenance documents, text hygiene, dependency policy, and the security policy:
+CI runs tests on Linux and Windows with Python 3.10, 3.12, and 3.14. A separate job enforces Ruff linting/formatting, Bandit security checks, dependency auditing, an 85% minimum branch-aware coverage score, example consistency, and wheel/source distribution validation. The runtime has no third-party dependencies; development tools and the build backend are pinned and audited.
 
 ```sh
+python -m pip install -r requirements-dev.txt .
 python -m compileall oss_release_guard tests scripts
 python scripts/check_quality.py
+ruff check .
+ruff format --check .
+bandit -r oss_release_guard -ll
+pip-audit -r requirements-dev.txt --strict
 python -m unittest discover -s tests -v
+python scripts/check_examples.py
 ```
+
+Run `coverage run -m unittest discover -s tests`, then `coverage combine` and `coverage report` for the coverage gate. Use `python -m build`, `twine check --strict dist/*`, and `python scripts/verify_dist.py` to validate release artifacts. [Dependabot](.github/dependabot.yml) proposes updates to development tools and pinned GitHub Actions.
 
 ## Try a local demonstration
 
@@ -91,4 +117,4 @@ This synthetic example demonstrates the command; the digest generated alongside 
 python -m unittest discover -s tests -v
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), [triage process](docs/triage-process.md), [review guidelines](docs/review-guidelines.md), [release process](docs/release-process.md), [quality standards](docs/quality-standards.md), [maintainer responsibilities](docs/maintainer-responsibilities.md), and [architecture](docs/architecture.md). The project is MIT-licensed. Adoption, ecosystem impact, and eligibility for any maintainer program have not been established.
+See [CONTRIBUTING.md](CONTRIBUTING.md), [triage process](docs/triage-process.md), [review guidelines](docs/review-guidelines.md), [release process](docs/release-process.md), [quality standards](docs/quality-standards.md), [maintainer responsibilities](docs/maintainer-responsibilities.md), and [architecture](docs/architecture.md). The project is MIT-licensed and maintained through public [issues](https://github.com/PiotrOnGit123/oss-release-guard/issues), [pull requests](https://github.com/PiotrOnGit123/oss-release-guard/pulls?q=is%3Apr), and [releases](https://github.com/PiotrOnGit123/oss-release-guard/releases). External adoption and production use have not been measured.

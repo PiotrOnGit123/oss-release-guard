@@ -6,6 +6,7 @@ body:
     attributes:
       value: |
         Do not include exploit archives, credentials, private source releases, or sensitive reproduction details in a public issue. If details are sensitive, request a private maintainer channel.
+        First check Security > Report a vulnerability. If unavailable, use only a placeholder such as: "I have a potentially sensitive report affecting the current release. Please provide a private reporting channel." Wait for a confirmed private destination before sending details.
   - type: dropdown
     id: disclosure
     attributes:

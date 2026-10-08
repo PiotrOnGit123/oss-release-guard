@@ -1,0 +1,76 @@
+{
+  "failed_gates": [],
+  "gates": [
+    {
+      "evidence": "A release version such as v0.2.0 is required.",
+      "name": "version",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "evidence": "CI status is passing.",
+      "name": "ci",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "evidence": "Automated tests passed.",
+      "name": "tests",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "evidence": "Linting or repository quality gate passed.",
+      "name": "quality",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "evidence": "Security review is complete.",
+      "name": "security",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "evidence": "Release artifacts were verified.",
+      "name": "artifacts",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "evidence": "Documentation was updated.",
+      "name": "docs",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "evidence": "Changelog was updated.",
+      "name": "changelog",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "evidence": "Release notes are ready.",
+      "name": "notes",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "evidence": "No unresolved release blockers remain.",
+      "name": "blockers",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "evidence": "The manifest must not contain secret-like field names.",
+      "name": "sensitive_fields",
+      "passed": true,
+      "severity": "info"
+    }
+  ],
+  "kind": "release_readiness",
+  "ready": true,
+  "schema_version": 1,
+  "sensitive_field_count": 0,
+  "version": "v0.2.0"
+}

@@ -12,12 +12,18 @@ Use the issue templates so maintainers can triage consistently:
 Install and run the tests from the repository root:
 
 ```sh
-python -m pip install .
+python -m pip install -r requirements-dev.txt .
+ruff check .
+ruff format --check .
+bandit -r oss_release_guard -ll
 python scripts/check_quality.py
 python -m unittest discover -s tests -v
+python scripts/check_examples.py
 ```
 
 Changes to archive policy or maintainer workflow output should include a small fixture demonstrating the accepted or rejected case. Document compatibility effects, especially changes affecting legitimate release archives or release automation. Keep runtime dependencies minimal and preserve stable exit-code behavior.
+
+Use `ruff format .` for formatting. When example behavior changes intentionally, run `python scripts/check_examples.py --update` and review the input/output diff. CI also checks coverage, audits development dependencies, and builds and validates wheel/source distributions; see [quality standards](docs/quality-standards.md).
 
 Reviewers should check failure paths, resource implications, user-facing output, documentation accuracy, and whether security guarantees are overstated. Security reports follow [SECURITY.md](SECURITY.md). Release-facing PRs must update [CHANGELOG.md](CHANGELOG.md) or explain why no changelog entry is needed.
 
