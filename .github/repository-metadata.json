@@ -1,0 +1,32 @@
+{
+  "labels": [
+    {"name": "bug", "color": "d73a4a", "description": "Incorrect behavior, crash, or regression."},
+    {"name": "security", "color": "b60205", "description": "Vulnerability report, hardening task, or disclosure-sensitive concern."},
+    {"name": "triage", "color": "fbca04", "description": "Needs maintainer classification before implementation."},
+    {"name": "needs-review", "color": "5319e7", "description": "Needs maintainer review before merge."},
+    {"name": "release", "color": "0e8a16", "description": "Blocks or supports a versioned release."},
+    {"name": "documentation", "color": "0075ca", "description": "Docs, examples, README, or guidance work."},
+    {"name": "quality", "color": "c2e0c6", "description": "Tests, CI, linting, maintainability, or reliability work."},
+    {"name": "good first issue", "color": "7057ff", "description": "Small, low-risk, well-scoped task."},
+    {"name": "breaking-change", "color": "d93f0b", "description": "User-visible incompatibility or contract change."},
+    {"name": "maintenance", "color": "bfdadc", "description": "Repository hygiene, automation, process, or metadata."}
+  ],
+  "milestones": [
+    {
+      "title": "v0.1.0",
+      "description": "Initial pre-release with offline archive verification.",
+      "state": "closed"
+    },
+    {
+      "title": "v0.2.0",
+      "description": "Maintainer workflow helpers, process documentation, and CI quality gates.",
+      "state": "open"
+    }
+  ],
+  "release": {
+    "tag_name": "v0.2.0",
+    "name": "v0.2.0 - Maintainer workflow release",
+    "prerelease": true,
+    "body": "Maintainer workflow release for OSS Release Guard.\n\nHighlights:\n- Issue triage classifier for `bug`, `security`, `triage`, `release`, `documentation`, `quality`, and `good first issue` workflows.\n- Pull request review checklist generator with risk and reviewer-focus output.\n- Release readiness gates and release notes generation from structured JSON.\n- CI quality gates covering source compilation, repository policy checks, tests, installed CLI behavior, and maintainer workflow smoke tests.\n- Expanded README, CONTRIBUTING, SECURITY, CHANGELOG, code of conduct, issue templates, PR template, and maintainer process docs.\n\nValidation:\n- Local compile check passed.\n- Local repository quality gate passed.\n- Local unittest discovery passed: 40 tests.\n\nSecurity and quality:\n- No runtime dependencies were added.\n- Vulnerability handling is documented in SECURITY.md.\n- Release artifacts should still be verified with independently trusted digests and signatures where available."
+  }
+}
