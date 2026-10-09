@@ -5,7 +5,7 @@
 
 A small maintainer toolkit for open-source release work. It helps maintainers check release archive readiness, classify issues and pull requests, generate review checklists, and prepare release notes before a project ships.
 
-Version **0.2.0** is an early project. The archive audit supports TAR, TAR.GZ, TAR.BZ2, TAR.XZ, and ZIP. The audit command does not extract files or access the network. Python 3.10 or newer is required; the runtime uses the Python standard library.
+Version **0.2.0** is an early project. Its [published pre-release](https://github.com/PiotrOnGit123/oss-release-guard/releases/tag/v0.2.0) includes a wheel, source distribution, checksums, and archive reports from the [verified publication run](https://github.com/PiotrOnGit123/oss-release-guard/actions/runs/37894134275). The archive audit supports TAR, TAR.GZ, TAR.BZ2, TAR.XZ, and ZIP. The audit command does not extract files or access the network. Python 3.10 or newer is required; the runtime uses the Python standard library.
 
 ## Get started
 
@@ -118,3 +118,5 @@ python -m unittest discover -s tests -v
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [triage process](docs/triage-process.md), [review guidelines](docs/review-guidelines.md), [release process](docs/release-process.md), [quality standards](docs/quality-standards.md), [maintainer responsibilities](docs/maintainer-responsibilities.md), and [architecture](docs/architecture.md). The project is MIT-licensed and maintained through public [issues](https://github.com/PiotrOnGit123/oss-release-guard/issues), [pull requests](https://github.com/PiotrOnGit123/oss-release-guard/pulls?q=is%3Apr), and [releases](https://github.com/PiotrOnGit123/oss-release-guard/releases). External adoption and production use have not been measured.
+
+The [maintenance evidence](CHALLENGE_EVIDENCE.md) maps the working commands, reviewed changes, issue triage, quality results, and published release to the challenge requirements, including the remaining GitHub About metadata step.
