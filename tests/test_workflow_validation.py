@@ -186,6 +186,33 @@ class GithubRecordTests(unittest.TestCase):
 
 
 class JsonInputTests(unittest.TestCase):
+    def test_exponent_overflow_is_rejected_at_any_depth(self) -> None:
+        cases = (
+            b'{"value":1e309}',
+            b'{"value":-1e309}',
+            b'{"value":1e99999}',
+            b'{"metadata":{"values":[0,1e309]}}',
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "input.json"
+            for raw in cases:
+                with self.subTest(raw=raw):
+                    path.write_bytes(raw)
+                    with self.assertRaisesRegex(ValueError, "^Non-finite JSON numbers"):
+                        load_json(path)
+
+    def test_finite_numbers_remain_supported(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "input.json"
+            path.write_text(
+                '{"values":[1.25,-2.5,1e308,-1e308,0.0,7,123456789012345678901234567890]}',
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                load_json(path)["values"],
+                [1.25, -2.5, 1e308, -1e308, 0.0, 7, 123456789012345678901234567890],
+            )
+
     def test_invalid_input_is_rejected_without_echoing_content(self) -> None:
         cases = [
             b"\xff",
@@ -214,6 +241,25 @@ class JsonInputTests(unittest.TestCase):
 class WorkflowCliValidationTests(unittest.TestCase):
     run_cli = cli_support.MaintainerCliTests.run_cli
     write_json = cli_support.MaintainerCliTests.write_json
+
+    def test_all_commands_reject_exponent_overflow_without_disclosing_input(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "overflow.json"
+            path.write_text('{"title":"synthetic-private-text","value":1e309}', encoding="utf-8")
+            for command in (
+                "triage-issue",
+                "review-checklist",
+                "release-readiness",
+                "release-notes",
+            ):
+                with self.subTest(command=command):
+                    result = self.run_cli(command, str(path))
+                    self.assertEqual(result.returncode, 2)
+                    self.assertEqual(result.stdout, "")
+                    self.assertIn("Non-finite JSON numbers are not allowed", result.stderr)
+                    self.assertNotIn("Traceback", result.stderr)
+                    self.assertNotIn("synthetic-private-text", result.stderr)
+                    self.assertNotIn("1e309", result.stderr)
 
     def test_help_lists_maintainer_commands(self) -> None:
         result = self.run_cli("--help")

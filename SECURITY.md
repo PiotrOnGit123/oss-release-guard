@@ -26,6 +26,8 @@ Do not publish exploit archives, private source releases, credentials, tokens, o
 
 Maintainer JSON inputs are limited to 1 MiB and 32 nesting levels. Invalid UTF-8, duplicate object keys, and non-finite numbers are rejected. The release gate counts secret-like field names, including nested names, and blocks the release without echoing those names or values. This is a conservative field-name rule, not a complete secret scanner: values under unrelated names can still contain sensitive information. Sanitize inputs before committing or sharing them. Readiness results reflect caller declarations rather than independently verified live CI state.
 
+The published v0.2.0 JSON parser rejects literal `NaN` and `Infinity`, but exponent overflow such as `1e309` can still become a non-finite float. Version 0.2.1 fixes overflow as well; see [issue #23](https://github.com/PiotrOnGit123/oss-release-guard/issues/23), the [changelog](CHANGELOG.md), and [publication tracking #24](https://github.com/PiotrOnGit123/oss-release-guard/issues/24). Existing v0.2.0 assets have not been silently replaced. This is a confirmed input-validation defect, not an established code-execution or credential-disclosure vulnerability.
+
 CI runs Bandit on the runtime Python package and audits pinned development dependencies with pip-audit. Passing those checks does not establish the absence of vulnerabilities.
 
 The audit reads local files and parses archive metadata. It does not extract members or fetch an expected digest. Obtain the digest independently through a trusted release process. The parser and Python runtime remain part of the attack surface.

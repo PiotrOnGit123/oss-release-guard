@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   verify:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish-v0.2.0]')
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish-release]')
     uses: ./.github/workflows/ci.yml
   publish:
     needs: verify

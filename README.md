@@ -5,7 +5,7 @@
 
 A small maintainer toolkit for open-source release work. It helps maintainers check release archive readiness, classify issues and pull requests, generate review checklists, and prepare release notes before a project ships.
 
-Version **0.2.0** is an early project. Its [published pre-release](https://github.com/PiotrOnGit123/oss-release-guard/releases/tag/v0.2.0) includes a wheel, source distribution, checksums, and archive reports from the [verified publication run](https://github.com/PiotrOnGit123/oss-release-guard/actions/runs/37894134275). The archive audit supports TAR, TAR.GZ, TAR.BZ2, TAR.XZ, and ZIP. The audit command does not extract files or access the network. Python 3.10 or newer is required; the runtime uses the Python standard library.
+Version **0.2.1** is being prepared under [release issue #24](https://github.com/PiotrOnGit123/oss-release-guard/issues/24). The previous [published pre-release v0.2.0](https://github.com/PiotrOnGit123/oss-release-guard/releases/tag/v0.2.0) remains immutable. The archive audit supports TAR, TAR.GZ, TAR.BZ2, TAR.XZ, and ZIP. The audit command does not extract files or access the network. Python 3.10 or newer is required; the runtime uses the Python standard library.
 
 ## Get started
 
@@ -58,6 +58,8 @@ oss-release-guard release-notes examples/release-changes.json
 These commands are deterministic helpers, not bots. A maintainer still makes the final call, but the output gives a consistent starting point for labels, review focus, release gates, and release notes.
 
 They accept simple JSON records and GitHub API label (`{"name": "security"}`) and changed-file (`{"filename": "SECURITY.md"}`) objects. The readiness manifest records maintainer declarations; it does not query live CI or authenticate the evidence supplied by a caller. Missing or invalid versions, failed gates, unresolved blockers, and secret-like fields prevent a ready result. Invalid input exits `2`; a valid but blocked release exits `1`.
+
+The JSON exponent-overflow fix is part of version 0.2.1 and is not in the already published v0.2.0 assets; see [issue #23](https://github.com/PiotrOnGit123/oss-release-guard/issues/23) and the [changelog](CHANGELOG.md). Release tags and assets are not retroactively replaced.
 
 Example triage result:
 

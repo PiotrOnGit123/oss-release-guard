@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.1 - 2026-10-09
+
+### Fixed
+
+- Reject JSON exponent overflow such as `1e309` and `-1e309` before processing any maintainer command. Errors remain static and use CLI exit code `2`; finite floats and integer handling are unchanged. Tracked in issue #23.
+
+### Maintenance
+
+- Reviewed and merged Dependabot's full-SHA updates to setup-python v7.0.0 (#16) and checkout v7.0.1 (#17) across CI and verified publication. Read-only PR checks, non-persisted checkout credentials, and publication gating remain in place. Tracked in issue #22.
+- These patch-version changes are not included in the immutable v0.2.0 release assets; no existing release tag or asset is replaced. Publication and artifact verification are tracked in issue #24.
+
 ## 0.2.0 - 2026-10-09
 
 ### Security And Input Compatibility

@@ -27,7 +27,7 @@ The manifest is a maintainer declaration, not live CI evidence. The version must
 
 ## Verified publication
 
-The [Verified Release workflow](../.github/workflows/release.yml) is run manually from GitHub Actions after the release metadata and notes are reviewed on `main`. Its initial v0.2.0 publication is triggered by the explicitly marked merge that installs the workflow. Ordinary PRs and pushes cannot publish a release.
+The [Verified Release workflow](../.github/workflows/release.yml) is run manually from GitHub Actions after the release metadata and notes are reviewed on `main`. A reviewed release-preparation merge changing the publisher or release workflow may also trigger it with the explicit `[publish-release]` commit marker. Ordinary PRs and unmarked pushes cannot publish a release. The package version and metadata determine the tag; the marker is no longer tied to v0.2.0.
 
 1. Review `.github/repository-metadata.json`, the package version, changelog, and `docs/releases/vVERSION.md`. Preview the metadata with `python scripts/publish_release.py --plan`; this mode needs neither credentials nor network access.
 2. The workflow reruns the full Linux/Windows matrix and quality/security gates.
