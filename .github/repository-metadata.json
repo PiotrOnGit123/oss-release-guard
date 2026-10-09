@@ -25,7 +25,7 @@
     {
       "title": "v0.2.1",
       "description": "Reject JSON exponent overflow and ship reviewed CI action upgrades.",
-      "state": "open"
+      "state": "closed"
     },
     {
       "title": "v0.3.0",
@@ -36,7 +36,7 @@
   "milestone_items": {
     "v0.2.0": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 19, 20, 21],
     "v0.2.1": [16, 17, 22, 23, 24, 25],
-    "v0.3.0": []
+    "v0.3.0": [26]
   },
   "topics": ["open-source", "maintainer-tools", "release-management", "security", "quality-assurance", "python", "cli", "issue-triage"],
   "release": {
