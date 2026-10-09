@@ -5,7 +5,7 @@
 
 A small maintainer toolkit for open-source release work. It helps maintainers check release archive readiness, classify issues and pull requests, generate review checklists, and prepare release notes before a project ships.
 
-Version **0.2.1** is being prepared under [release issue #24](https://github.com/PiotrOnGit123/oss-release-guard/issues/24). The previous [published pre-release v0.2.0](https://github.com/PiotrOnGit123/oss-release-guard/releases/tag/v0.2.0) remains immutable. The archive audit supports TAR, TAR.GZ, TAR.BZ2, TAR.XZ, and ZIP. The audit command does not extract files or access the network. Python 3.10 or newer is required; the runtime uses the Python standard library.
+Version **0.2.1** is an early pre-release. Its [published patch release](https://github.com/PiotrOnGit123/oss-release-guard/releases/tag/v0.2.1) includes a wheel, source distribution, checksums and archive reports from the [verified publication run](https://github.com/PiotrOnGit123/oss-release-guard/actions/runs/37979848886). The previous [v0.2.0 release](https://github.com/PiotrOnGit123/oss-release-guard/releases/tag/v0.2.0) remains immutable. The archive audit supports TAR, TAR.GZ, TAR.BZ2, TAR.XZ, and ZIP. The audit command does not extract files or access the network. Python 3.10 or newer is required; the runtime uses the Python standard library.
 
 ## Get started
 
