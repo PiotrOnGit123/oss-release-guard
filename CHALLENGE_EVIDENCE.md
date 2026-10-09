@@ -101,7 +101,7 @@ Validated locally on 2026-10-08:
 - No additional GitHub accounts were used.
 - No fake identities, signatures, or contributors were created.
 - The authenticated tools could create files, branches, pull requests, issues, comments, labels on issues/PRs, and merges.
-- The authorized release workflow uses a temporary job token for contents/issues writes only after CI and artifact validation. No token is stored in the repository, and ordinary CI is read-only.
+- The authorized release workflow uses a temporary job token for contents/issues/PR writes only after CI and artifact validation. PR write permission is required by GitHub to assign milestones to PRs. No token is stored in the repository, and ordinary CI is read-only.
 - The workflow creates the actual version milestones and synchronizes canonical labels; the final publication run and issue #8 provide evidence of completion.
 - Repository description/topics administration is not exposed by the current connector. Desired topics are recorded in `.github/repository-metadata.json`, but they are not claimed to exist as live GitHub topics.
 - This is an early functional project. External adoption, independent human review, and winning the challenge have not been established.
