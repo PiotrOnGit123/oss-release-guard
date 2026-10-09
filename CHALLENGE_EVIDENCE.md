@@ -49,6 +49,7 @@ The repository was expanded instead of deleted or recreated. No transfer or addi
 - #19 Fix label update payloads and diagnose release API permissions: https://github.com/PiotrOnGit123/oss-release-guard/pull/19
 - #20 Allow the gated publisher to assign PR milestones: https://github.com/PiotrOnGit123/oss-release-guard/pull/20
 - #21 Document the published release and verified maintenance evidence: https://github.com/PiotrOnGit123/oss-release-guard/pull/21
+- #25 Reject JSON exponent overflow and prepare verified v0.2.1: https://github.com/PiotrOnGit123/oss-release-guard/pull/25
 
 Real Dependabot proposals [#16 (setup-python)](https://github.com/PiotrOnGit123/oss-release-guard/pull/16) and [#17 (checkout)](https://github.com/PiotrOnGit123/oss-release-guard/pull/17) were initially deferred, then approved and merged during the follow-up audit. Both current diffs covered CI and publication, exact pins matched official upstream tags, and combined main CI passed: https://github.com/PiotrOnGit123/oss-release-guard/actions/runs/37976958767 . Their maintenance tracking [issue #22](https://github.com/PiotrOnGit123/oss-release-guard/issues/22) is complete. They are automated contributions reviewed by the maintainer, not independent human reviews or invented accounts. These upgrades are included in v0.2.1 preparation, not retroactive changes to v0.2.0.
 
