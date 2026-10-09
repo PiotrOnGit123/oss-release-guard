@@ -10,6 +10,7 @@
 - Immutable release source: `367a2e4551c205254f3ccb3ede22737c180f3620`.
 - Closed v0.2.0 milestone: https://github.com/PiotrOnGit123/oss-release-guard/milestone/2
 - Open v0.3.0 follow-up milestone: https://github.com/PiotrOnGit123/oss-release-guard/milestone/3
+- Patch release preparation: https://github.com/PiotrOnGit123/oss-release-guard/issues/24 ; v0.2.1 is not claimed as published until that issue is completed by the verified workflow.
 
 ## Existing Repository Assessment
 
@@ -48,8 +49,9 @@ The repository was expanded instead of deleted or recreated. No transfer or addi
 - #19 Fix label update payloads and diagnose release API permissions: https://github.com/PiotrOnGit123/oss-release-guard/pull/19
 - #20 Allow the gated publisher to assign PR milestones: https://github.com/PiotrOnGit123/oss-release-guard/pull/20
 - #21 Document the published release and verified maintenance evidence: https://github.com/PiotrOnGit123/oss-release-guard/pull/21
+- #25 Reject JSON exponent overflow and prepare verified v0.2.1: https://github.com/PiotrOnGit123/oss-release-guard/pull/25
 
-Real Dependabot proposals [#16 (setup-python)](https://github.com/PiotrOnGit123/oss-release-guard/pull/16) and [#17 (checkout)](https://github.com/PiotrOnGit123/oss-release-guard/pull/17) received maintainer reviews and are deferred to v0.3.0. They are automated contributions, not independent human reviews or invented accounts. Their matching action pins must be reviewed across CI and publication before merging.
+Real Dependabot proposals [#16 (setup-python)](https://github.com/PiotrOnGit123/oss-release-guard/pull/16) and [#17 (checkout)](https://github.com/PiotrOnGit123/oss-release-guard/pull/17) were initially deferred, then approved and merged during the follow-up audit. Both current diffs covered CI and publication, exact pins matched official upstream tags, and combined main CI passed: https://github.com/PiotrOnGit123/oss-release-guard/actions/runs/37976958767 . Their maintenance tracking [issue #22](https://github.com/PiotrOnGit123/oss-release-guard/issues/22) is complete. They are automated contributions reviewed by the maintainer, not independent human reviews or invented accounts. These upgrades are included in v0.2.1 preparation, not retroactive changes to v0.2.0.
 
 ## Issues
 
@@ -61,6 +63,9 @@ Real Dependabot proposals [#16 (setup-python)](https://github.com/PiotrOnGit123/
 - #10 Improve examples for release notes generator: https://github.com/PiotrOnGit123/oss-release-guard/issues/10
 - #11 Auto-classify PRs that touch GitHub templates: https://github.com/PiotrOnGit123/oss-release-guard/issues/11
 - #14 Reject malformed release gates and support GitHub API records: https://github.com/PiotrOnGit123/oss-release-guard/issues/14
+- #22 Complete compatibility review of pinned GitHub Actions v7 upgrades: https://github.com/PiotrOnGit123/oss-release-guard/issues/22
+- #23 Reject JSON exponent overflow before maintainer workflow processing: https://github.com/PiotrOnGit123/oss-release-guard/issues/23
+- #24 Publish v0.2.1 with the verified JSON overflow fix: https://github.com/PiotrOnGit123/oss-release-guard/issues/24
 
 PR #15 closed #5, #6, #7, #9, #10, #11, and #14 with reproducible fixes/tests and maintainer triage comments. Issue #8 was closed only after actual publication succeeded on 2026-10-09. All eight issues are assigned to the closed v0.2.0 milestone.
 
@@ -73,7 +78,7 @@ The public release is not a draft and remains explicitly marked as an early pre-
 - `SHA256SUMS`
 - `artifact-audit.json`
 
-The successful publication run completed all six Linux/Windows Python matrix jobs, the quality/security/coverage/package job, and the publication job. It built and audited both distributions and exercised all four maintainer commands from the installed wheel outside the checkout. The v0.2.0 milestone had zero open items and 18 closed issues/PRs when publication completed. v0.1.0 is also a real closed milestone; v0.3.0 contains the two reviewed Dependabot follow-ups.
+The successful publication run completed all six Linux/Windows Python matrix jobs, the quality/security/coverage/package job, and the publication job. It built and audited both distributions and exercised all four maintainer commands from the installed wheel outside the checkout. The v0.2.0 milestone had zero open items and 18 closed issues/PRs when publication completed. v0.1.0 is also a real closed milestone. v0.3.0 remains open for development work; the Dependabot upgrades were subsequently completed there without claiming a v0.3.0 release.
 
 The first publication attempts stopped before creating the tag. PR #19 added safe endpoint/permission diagnostics; the next log identified `PATCH /issues/1` as requiring PR write permission. PR #20 scoped that permission to the trusted publication job. The failed runs remain visible as honest repair history, not hidden or represented as successful releases.
 
@@ -85,8 +90,30 @@ The first publication attempts stopped before creating the tag. PR #19 added saf
 | Issue classification | Issue templates, `.github/labels.yml`, `.github/repository-metadata.json`, `docs/triage-process.md`, `triage-issue` command, issues #5-#11 with labels and maintainer comments. |
 | Release management | Changelog, release docs, readiness/notes commands, v0.1.0 and published v0.2.0 releases, wheel/source assets, checksums, archive reports, actual closed milestones, and completed issue #8. |
 | Security | `SECURITY.md`, security-related issue template, security labels, security-focused issues #6 and #7, CI checks, and security guidance in review and triage docs. |
-| Code quality | 74 tests, 92% branch-aware runtime coverage, Ruff lint/format, Bandit, pip-audit, six platform/Python combinations, an 85% coverage gate, example consistency, package validation, Dependabot, and no runtime dependencies. |
+| Code quality | 77 development-head tests (74 at v0.2.0 publication), 92% branch-aware runtime coverage, Ruff lint/format, Bandit, pip-audit, six platform/Python combinations, an 85% coverage gate, example consistency, package validation, reviewed Dependabot upgrades, and no runtime dependencies. |
 | Maintainer documentation | `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `docs/maintainer-responsibilities.md`, `docs/architecture.md`, triage/review/release/quality docs. |
+
+## Original Requirements Audit
+
+The original nine requirement groups were rechecked against public GitHub state and a fresh source checkout on 2026-10-09. The audit found a real JSON exponent-overflow defect and completed the previously deferred dependency reviews. Status describes evidence, not a prediction of the challenge result.
+
+| Original group | Status | Verified evidence or remaining work |
+| --- | --- | --- |
+| 1. Working code | Met, with a follow-up fix | Archive audit plus four maintainer commands, runnable README instructions, committed example inputs/outputs, tests and lint. Issue #23 records the additional overflow regression and fix. |
+| 2. Documentation | Met | All requested top-level documents and triage/release/review/quality/responsibility/architecture docs exist. README and SECURITY distinguish the previous release from patch-version fixes. |
+| 3. GitHub metadata | Partially met | Four issue forms, a PR checklist, CI, all ten requested labels, and live v0.1.0/v0.2.0/v0.3.0 milestones exist. Live About topics are absent and the description needs expansion; static desired metadata is not counted as live configuration. |
+| 4. Real issues | Met | The eight original follow-up issues #5-#11/#14 have labels, milestones and maintainer comments. Actual audit findings and maintenance work are tracked in #22/#23. No pretend reports or adoption claims were created. |
+| 5. Real PR workflow | Met with disclosed limits | Scoped branches/changes, descriptions, checklists, issue links, CI, actual squash merges, maintainer self-review, a resolved inline finding, and maintainer approvals on the real bot contributions #16/#17. No independent second human review is claimed. |
+| 6. Releases | Met | Public v0.1.0 and v0.2.0 releases, tags, notes, changelog/security/quality links, and a closed v0.2.0 milestone. v0.2.0 has four verified downloadable assets. v0.3.0 is not claimed to be published. |
+| 7. Security and quality | Met within stated boundaries | Runtime regression tests, Ruff, Bandit, strict dependency audit, coverage enforcement, package verification, private-disclosure fallback, public non-sensitive security tasks and documented maintainer response. These controls do not prove absence of vulnerabilities. |
+| 8. Evidence file | Met | This file records repository reuse, real issue/PR/release links, domain compliance, execution instructions, measured validation and collaboration assumptions. |
+| 9. Final validation | Checks performed | Fresh clone matched public main, baseline combined Actions passed, 77 local tests passed, examples and documentation targets were checked, and the scoped secret-pattern scan had no matches. Follow-up PR CI is required before merging the new runtime fix. |
+
+No new repository, transfer or additional human account was required. The remaining mandatory owner action is saving live About metadata, detailed below. Branch protection and a configured private advisory channel are additional recommendations, not requirements falsely marked as completed; the observed main branch is unprotected and SECURITY documents the fallback rather than claiming private reporting is enabled.
+
+### Follow-Up Regression
+
+The audit reproduced `{ "value": 1e309 }` becoming an infinite Python float. Rejecting literal `NaN`/`Infinity` alone did not cover exponent overflow. The v0.2.1 fix uses a finite-float parsing hook; three additional tests cover signed/nested overflow, finite-number compatibility, and non-disclosing exit-code `2` behavior for all four CLI commands. This produces 77 passing tests and retains 92% branch-aware runtime coverage. Published v0.2.0 assets remain unchanged and retain the documented limitation; issue #24 separately tracks actual patch publication.
 
 ## Run Instructions
 
@@ -111,13 +138,15 @@ Validated locally on 2026-10-08 and rechecked after publication on 2026-10-09:
 
 - `python -m compileall oss_release_guard tests scripts`: passed
 - `python scripts/check_quality.py`: passed
-- `python -m unittest discover -s tests -v`: passed, 74 tests
+- `python -m unittest discover -s tests -v`: passed, 77 development-head tests; the published v0.2.0 source had 74
 - CLI smoke checks for maintainer workflow examples: passed
 - The Python 3.10 matrix uses the development-only `tomli` parser rather than an ad hoc TOML fallback.
 - Ruff lint/format, Bandit, pip-audit, example outputs, distribution build, strict Twine checks, and wheel/source archive audits passed.
 - PR #15 CI passed: https://github.com/PiotrOnGit123/oss-release-guard/actions/runs/37842467178
 - PR #20 CI passed: https://github.com/PiotrOnGit123/oss-release-guard/actions/runs/37893835752
 - Publication gates and asset upload passed: https://github.com/PiotrOnGit123/oss-release-guard/actions/runs/37894134275
+- Combined main CI after both reviewed Actions upgrades passed: https://github.com/PiotrOnGit123/oss-release-guard/actions/runs/37976958767
+- Follow-up local regression run, Ruff lint/format, Bandit, compile/policy checks, example comparison, and branch coverage passed. New runtime fixes must still pass PR CI before merge.
 - A fresh clone of published `main` was clean before the final documentation update. Local Markdown targets were checked, and no token/private-key pattern was found in tracked text files. These checks are bounded validation, not proof that all possible secrets or vulnerabilities are absent.
 
 ## Remaining GitHub Administration

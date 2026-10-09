@@ -23,21 +23,27 @@
       "state": "closed"
     },
     {
+      "title": "v0.2.1",
+      "description": "Reject JSON exponent overflow and ship reviewed CI action upgrades.",
+      "state": "open"
+    },
+    {
       "title": "v0.3.0",
-      "description": "Review major GitHub Actions upgrades across CI and publication workflows.",
+      "description": "Future maintainer workflow improvements; no release has been published.",
       "state": "open"
     }
   ],
   "milestone_items": {
-    "v0.2.0": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 19, 20],
-    "v0.3.0": [16, 17]
+    "v0.2.0": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 19, 20, 21],
+    "v0.2.1": [16, 17, 22, 23, 24, 25],
+    "v0.3.0": []
   },
   "topics": ["open-source", "maintainer-tools", "release-management", "security", "quality-assurance", "python", "cli", "issue-triage"],
   "release": {
-    "tag_name": "v0.2.0",
-    "name": "v0.2.0 - Maintainer workflow release",
+    "tag_name": "v0.2.1",
+    "name": "v0.2.1 - JSON overflow validation fix",
     "prerelease": true,
-    "notes_file": "docs/releases/v0.2.0.md",
-    "tracking_issue": 8
+    "notes_file": "docs/releases/v0.2.1.md",
+    "tracking_issue": 24
   }
 }

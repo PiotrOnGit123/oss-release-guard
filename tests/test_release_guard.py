@@ -20,6 +20,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = PROJECT_ROOT
 sys.path.insert(0, str(SOURCE_ROOT))
 
+from oss_release_guard import __version__  # noqa: E402
 from oss_release_guard.core import AuditError, inspect_release  # noqa: E402
 
 
@@ -384,7 +385,7 @@ class CommandLineTests(ArchiveFixtureTest):
     def test_version(self) -> None:
         result = self.run_cli("--version")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("0.2.0", result.stdout)
+        self.assertEqual(result.stdout.strip(), f"oss-release-guard {__version__}")
 
 
 if __name__ == "__main__":

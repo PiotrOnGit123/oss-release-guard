@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 from collections.abc import Iterable, Mapping
 from pathlib import Path
@@ -374,7 +375,10 @@ def load_json(path: Path) -> dict[str, Any]:
         raise ValueError("JSON input exceeds the 1 MiB limit.")
     try:
         data = json.loads(
-            raw.decode("utf-8"), object_pairs_hook=_unique_object, parse_constant=_reject_constant
+            raw.decode("utf-8"),
+            object_pairs_hook=_unique_object,
+            parse_constant=_reject_constant,
+            parse_float=_finite_float,
         )
         _check_depth(data)
     except (UnicodeError, json.JSONDecodeError, RecursionError) as error:
@@ -395,6 +399,13 @@ def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
 
 def _reject_constant(value: str) -> None:
     raise ValueError("Non-finite JSON numbers are not allowed.")
+
+
+def _finite_float(value: str) -> float:
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("Non-finite JSON numbers are not allowed.")
+    return number
 
 
 def _check_depth(value: Any, depth: int = 0) -> None:
