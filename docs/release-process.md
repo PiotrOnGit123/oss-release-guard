@@ -33,7 +33,7 @@ The [Verified Release workflow](../.github/workflows/release.yml) is run manuall
 2. The workflow reruns the full Linux/Windows matrix and quality/security gates.
 3. It builds wheel/source distributions, checks package metadata, audits archive policy, and generates `SHA256SUMS` and `artifact-audit.json`.
 4. It installs and exercises the wheel outside the source checkout.
-5. Only its final publication step receives the job's temporary GitHub token. That job has `contents: write` and `issues: write`; normal CI has read-only permissions and checkout credentials are not retained.
+5. Only its final publication step receives the job's temporary GitHub token. That job has `contents: write`, `issues: write`, and `pull-requests: write` (required to assign PR milestones); normal CI has read-only permissions and checkout credentials are not retained.
 6. The publisher synchronizes canonical labels, creates version milestones, assigns tracked issues/PRs, creates a draft release at the verified commit, uploads the four assets, and publishes it. It completes the release tracking issue and closes the milestone.
 
 Existing tags are never moved and existing assets are never overwritten. Repeating the same publication repairs unfinished milestone tracking without replacing an already published release. Repository description/topics and security settings require owner administration and are not changed by the release token. Uploaded checksums prove consistency, not independent authenticity or a signature.
