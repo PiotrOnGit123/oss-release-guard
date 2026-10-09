@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 - 2026-10-08
+## 0.2.0 - 2026-10-09
 
 ### Security And Input Compatibility
 
@@ -24,6 +24,7 @@
 - Expanded GitHub templates and documentation for triage, review, release management, quality standards, security handling, and maintainer responsibilities.
 - Added Ruff linting/formatting, Bandit, dependency auditing, an 85% coverage gate, Dependabot, reproducible example outputs, and wheel/source distribution validation.
 - Added regression tests for every release gate, malformed inputs, GitHub records, duplicate ZIP finding release notes, and disclosure-safe manifest reports.
+- Published verified wheel/source assets, SHA-256 checksums, and archive reports; synchronized live labels and version milestones through the gated release workflow.
 
 ## 0.1.0 - 2026-10-08
 
