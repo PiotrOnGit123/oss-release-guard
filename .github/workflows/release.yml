@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [.github/workflows/release.yml]
+    paths: [.github/workflows/release.yml, scripts/publish_release.py]
 permissions:
   contents: read
 concurrency:

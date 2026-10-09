@@ -144,6 +144,28 @@ class PublicationTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 publisher.github_request("GET", "/releases/tags/absent")
 
+    def test_api_failure_names_endpoint_and_required_scope_without_echoing_body(self) -> None:
+        body = io.BytesIO(
+            b'{"message":"Resource not accessible by integration","private_value":"synthetic-not-a-credential"}'
+        )
+        error = HTTPError(
+            "https://api.github.com",
+            403,
+            "denied",
+            {"X-Accepted-GitHub-Permissions": "issues=write"},
+            body,
+        )
+        with (
+            patch.dict(os.environ, {"GH_TOKEN": "synthetic-not-a-credential"}),
+            patch.object(publisher, "urlopen", side_effect=error),
+        ):
+            with self.assertRaises(RuntimeError) as caught:
+                publisher.github_request("PATCH", "/labels/bug", {})
+        self.assertIn("/labels/bug", str(caught.exception))
+        self.assertIn("issues=write", str(caught.exception))
+        self.assertIn("Resource not accessible by integration", str(caught.exception))
+        self.assertNotIn("synthetic-not-a-credential", str(caught.exception))
+
     def test_publication_from_a_pull_request_branch_is_rejected(self) -> None:
         with (
             patch.dict(
