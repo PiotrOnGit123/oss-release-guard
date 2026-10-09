@@ -50,16 +50,36 @@ def github_request(
             "Accept": "application/vnd.github+json",
             "Content-Type": "application/octet-stream" if upload else "application/json",
             "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "oss-release-guard-release-publisher",
         },
     )
     try:
         with urlopen(request, timeout=30) as response:
             return json.load(response)
     except HTTPError as error:
+        code = error.code
+        accepted = error.headers.get("X-Accepted-GitHub-Permissions", "") if error.headers else ""
+        try:
+            message = json.loads(error.read(8192)).get("message", "")
+        except (ValueError, OSError):
+            message = ""
         error.close()
-        if error.code == 404 and missing_ok:
+        if code == 404 and missing_ok:
             return None
-        raise RuntimeError(f"GitHub {method} request failed with HTTP {error.code}.") from None
+        requirement = f" Required permissions: {accepted}." if accepted else ""
+        reason = (
+            f" {message}."
+            if message
+            in {
+                "Resource not accessible by integration",
+                "Bad credentials",
+                "Must have admin rights to Repository.",
+            }
+            else ""
+        )
+        raise RuntimeError(
+            f"GitHub {method} {path} failed with HTTP {code}.{requirement}{reason}"
+        ) from None
 
 
 def sync_metadata(plan: dict) -> dict[str, dict]:
@@ -67,7 +87,12 @@ def sync_metadata(plan: dict) -> dict[str, dict]:
     for label in plan["labels"]:
         name = label["name"]
         path = "/labels/" + quote(name, safe="") if name in labels else "/labels"
-        github_request("PATCH" if name in labels else "POST", path, label)
+        payload = (
+            {"color": label["color"], "description": label["description"]}
+            if name in labels
+            else label
+        )
+        github_request("PATCH" if name in labels else "POST", path, payload)
     milestones = {
         item["title"]: item for item in github_request("GET", "/milestones?state=all&per_page=100")
     }
